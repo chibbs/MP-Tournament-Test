@@ -2,35 +2,45 @@ package de.sb.tournament.persistence;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class MatchEntityTest extends EntityTest{
-	@BeforeClass
+	
 	@Test
 	public void testConstraints() {
+		ValidatorFactory vf = super.getEntityValidatorFactory();
+		Validator validator;
+		try {
 		
-		Match entity = new Match() ;
-		 javax.validation.Validator validator = this.getEntityValidatorFactory().getValidator();
-		Set<ConstraintViolation<Match>> constraintViolations = validator.validate(entity);
-		assertEquals( 0, constraintViolations.size() );
+			validator = vf.getValidator();
+			Match entity = new Match( ) ;
+			entity.setLeftParentRank((byte) 0);
+			entity.setRightParentRank((byte) 0);
+			entity.setRightScore((short) 0);
+			entity.setLeftScore((short) 0);
+			
+			Set<ConstraintViolation<Match>> constraintViolations = validator.validate(entity);
+			assertEquals( 0, constraintViolations.size() );
+		} finally {
+			vf.close();
+		}
       
 	}
   
-	@AfterClass
-	
-	@BeforeClass
 	@Test
 	public void testLifeCycle() {
-
-        EntityManager em = this.getEntityManagerFactory().createEntityManager();
+		EntityManager em = super.getEntityManagerFactory().createEntityManager();
+		Set<Long> wb = super.getWasteBasket();
+		
 		em.getTransaction().begin();
 		Match entity = new Match() ;
 		em.persist(entity);
@@ -42,7 +52,7 @@ public class MatchEntityTest extends EntityTest{
 		    // Entity Not Found
 		}
 		em.flush();
-		this.getWasteBasket().add( entity.getIdentity());
+		wb.add( entity.getIdentity());
 	    
 	     javax.persistence.Cache cache = em.getEntityManagerFactory().getCache();
 	    cache.evict(entity.getClass(), entity.getIdentity());
