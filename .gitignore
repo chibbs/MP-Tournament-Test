@@ -53,3 +53,8 @@ $RECYCLE.BIN/
 *.lnk
 .classpath
 .project
+
+*.DS_Store
+
+
+\.settings/
