@@ -1,5 +1,10 @@
+# Custom
+.DS_Store
+
 # Compiled class file
 *.class
+.classpath
+.project
 
 #bin folder
 bin
